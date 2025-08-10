@@ -9,9 +9,16 @@ export default defineNuxtConfig({
     "@pages": fileURLToPath(new URL("./pages", import.meta.url)),
     "@assets": fileURLToPath(new URL("./assets", import.meta.url)),
     "@utils": fileURLToPath(new URL("./utils", import.meta.url)),
-    "@store": fileURLToPath(new URL("./store", import.meta.url)),
+    "@stores": fileURLToPath(new URL("./stores", import.meta.url)),
     "@types": fileURLToPath(new URL("./types", import.meta.url)),
   },
+
+  runtimeConfig: {
+    public: {
+      apiBase: process.env.NUXT_PUBLIC_API_BASE,
+    },
+  },
+
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   modules: [
@@ -20,6 +27,7 @@ export default defineNuxtConfig({
     "@nuxt/image",
     "@nuxtjs/tailwindcss",
     "@nuxtjs/google-fonts",
+    "@pinia/nuxt",
   ],
 
   googleFonts: {
