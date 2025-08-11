@@ -14,8 +14,8 @@ function goBack() {
       You do not have permission to access this page.
     </p>
     <button
-      @click="goBack"
       class="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
+      @click="goBack"
     >
       Go Back
     </button>

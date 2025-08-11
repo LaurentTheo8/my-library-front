@@ -42,7 +42,6 @@ export const useAuthStore = defineStore("auth", {
         });
 
         this.user = data;
-        console.log("on est dans le store auth", data);
       } catch (err) {
         console.error(err);
         this.logout();

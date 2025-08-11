@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 
@@ -9,6 +9,7 @@ const auth = useAuthStore();
 const router = useRouter();
 const errorMessage = ref("");
 const loading = ref(false);
+const mounted = ref(false);
 
 const isEmailValid = computed(() => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -28,11 +29,15 @@ async function handleLogin() {
   loading.value = false;
 
   if (success) {
-    router.push("/"); // Redirection after login
+    router.push("/");
   } else {
     errorMessage.value = "Login failed. Please check your credentials.";
   }
 }
+
+onMounted(() => {
+  mounted.value = true;
+});
 </script>
 
 <template>
@@ -61,6 +66,7 @@ async function handleLogin() {
       />
 
       <button
+        v-if="mounted"
         type="submit"
         :disabled="loading || !isEmailValid"
         class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
