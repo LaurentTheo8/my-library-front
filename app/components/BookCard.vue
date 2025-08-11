@@ -30,6 +30,10 @@ defineProps<{
   border: 1px solid #ddd;
   padding: 1rem;
   transition: box-shadow 0.2s ease, transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .book-card:hover {
@@ -40,14 +44,12 @@ defineProps<{
 .title {
   font-size: 1.2rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
   color: #333;
 }
 
 .author {
   color: #666;
   font-size: 0.95rem;
-  margin-bottom: 1rem;
 }
 
 .details-btn {
@@ -59,6 +61,7 @@ defineProps<{
   text-decoration: none;
   font-size: 0.9rem;
   transition: background-color 0.2s ease;
+  width: fit-content;
 }
 
 .details-btn:hover {

@@ -1,29 +1,27 @@
 <script setup lang="ts">
 defineProps<{
-  author: {
+  category: {
     id: number;
-    firstName: string;
-    lastName: string;
-    birthDate?: string | null;
-    books?: { id: number; title: string }[];
+    name: string;
+    description?: string | null;
   };
 }>();
 </script>
 
 <template>
-  <div class="author-card">
-    <h3 class="name">{{ author.firstName }} {{ author.lastName }}</h3>
-    <p v-if="author.birthDate" class="birthdate">
-      🎂 Born on: {{ new Date(author.birthDate).toLocaleDateString() }}
+  <div class="category-card">
+    <h3 class="name">{{ category.name }}</h3>
+    <p v-if="category.description" class="description">
+      {{ category.description }}
     </p>
-    <NuxtLink :to="`/public/authors/${author.id}`" class="details-btn">
-      👤 See details
+    <NuxtLink :to="`/public/categories/${category.id}`" class="details-btn">
+      📂 See details
     </NuxtLink>
   </div>
 </template>
 
 <style scoped>
-.author-card {
+.category-card {
   background: #fff;
   border-radius: 8px;
   border: 1px solid #ddd;
@@ -35,7 +33,7 @@ defineProps<{
   gap: 1rem;
 }
 
-.author-card:hover {
+.category-card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transform: translateY(-3px);
 }
@@ -46,7 +44,7 @@ defineProps<{
   color: #333;
 }
 
-.birthdate {
+.description {
   color: #666;
   font-size: 0.95rem;
 }
