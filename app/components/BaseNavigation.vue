@@ -8,7 +8,7 @@ const router = useRouter();
 
 function handleLogout() {
   auth.logout();
-  router.push("/login"); // Redirige vers login après déconnexion
+  router.push("/auth/login"); // Redirige vers login après déconnexion
 }
 </script>
 
@@ -46,7 +46,7 @@ function handleLogout() {
         <template v-else>
           <li>
             <NuxtLink
-              to="/login"
+              to="/auth/login"
               class="px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
               >Login</NuxtLink
             >
