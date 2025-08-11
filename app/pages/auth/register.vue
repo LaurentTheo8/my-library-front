@@ -74,7 +74,7 @@ async function handleRegister() {
         required
         :class="[
           'w-full border rounded px-3 py-2',
-          isEmailValid ? 'border-gray-300' : 'border-red-500',
+          email && !isEmailValid ? 'border-red-500' : 'border-gray-300',
         ]"
       />
       <p v-if="email && !isEmailValid" class="text-red-600 text-sm mt-1">
