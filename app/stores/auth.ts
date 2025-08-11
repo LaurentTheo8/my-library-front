@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import { useFetch } from "#app";
 import type { User } from "~/types/User";
 
 export const useAuthStore = defineStore("auth", {
@@ -14,20 +13,16 @@ export const useAuthStore = defineStore("auth", {
   actions: {
     async login(email: string, password: string) {
       try {
-        const { data, error } = await useFetch<{ token: string }>("/auth", {
+        const data = await $fetch<{ token: string }>("/auth", {
           method: "POST",
           baseURL: useRuntimeConfig().public.apiBase,
           body: { email, password },
         });
-        if (error.value)
-          throw new Error(error.value.data.message || "Login failed");
 
-        if (data.value) {
-          this.token = data.value.token;
-          localStorage.setItem("token", this.token);
-        }
+        this.token = data.token;
+        localStorage.setItem("token", this.token);
 
-        // await this.fetchUser();
+        await this.fetchUser();
 
         return true;
       } catch (err) {
@@ -35,27 +30,24 @@ export const useAuthStore = defineStore("auth", {
         return false;
       }
     },
-    // async fetchUser() {
-    //   if (!this.token) return;
+    async fetchUser() {
+      if (!this.token) return;
 
-    //   try {
-    //     const { data, error } = await useFetch<User>("/api/me", {
-    //       baseURL: useRuntimeConfig().public.apiBase,
-    //       headers: {
-    //         Authorization: `Bearer ${this.token}`,
-    //       },
-    //     });
-    //     if (error.value)
-    //       throw new Error(error.value.data.message || "Fetch user failed");
+      try {
+        const data = await $fetch<User>("/me", {
+          baseURL: useRuntimeConfig().public.apiBase,
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
+        });
 
-    //     if (data.value) {
-    //       this.user = data.value;
-    //     }
-    //   } catch (err) {
-    //     console.error(err);
-    //     this.logout();
-    //   }
-    // },
+        this.user = data;
+        console.log("on est dans le store auth", data);
+      } catch (err) {
+        console.error(err);
+        this.logout();
+      }
+    },
     logout() {
       this.token = null;
       this.user = null;
@@ -66,7 +58,7 @@ export const useAuthStore = defineStore("auth", {
         const token = localStorage.getItem("token");
         if (token) {
           this.token = token;
-          //   this.fetchUser();
+          this.fetchUser();
         }
       }
     },
