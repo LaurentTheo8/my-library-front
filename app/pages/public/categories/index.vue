@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import { useCategoryStore } from "~/stores/category";
-import CategoryCard from "~/components/CategoryCard.vue";
+import CategoryCard from "~/components/card/Category.vue";
 
 const categoryStore = useCategoryStore();
 

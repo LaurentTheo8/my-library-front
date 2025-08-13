@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import { useBookStore } from "~/stores/book";
-import BookCard from "~/components/BookCard.vue";
+import BookCard from "~/components/card/Book.vue";
 
 const bookStore = useBookStore();
 

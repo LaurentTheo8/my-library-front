@@ -4,8 +4,8 @@ import { useRouter } from "vue-router";
 import { useBookStore } from "~/stores/book";
 import { useAuthorStore } from "~/stores/author";
 import { useCategoryStore } from "~/stores/category";
-import AuthorSelector from "~/components/AuthorSelector.vue";
-import CategorySelector from "~/components/CategorySelector.vue";
+import AuthorSelector from "~/components/selector/Author.vue";
+import CategorySelector from "~/components/selector/Category.vue";
 
 const router = useRouter();
 const bookStore = useBookStore();
@@ -128,7 +128,7 @@ const isFormValid = computed(() => {
           <span
             v-if="isSubmitting"
             class="loader-border animate-spin inline-block w-4 h-4 rounded-full border-2 border-white border-t-transparent"
-          ></span>
+          />
           {{ isSubmitting ? "Creating..." : "Create" }}
         </button>
         <button

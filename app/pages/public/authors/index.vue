@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import { useAuthorStore } from "~/stores/author";
-import AuthorCard from "~/components/AuthorCard.vue";
+import AuthorCard from "~/components/card/Author.vue";
 
 const authorStore = useAuthorStore();
 
