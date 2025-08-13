@@ -44,7 +44,7 @@ NUXT_PUBLIC_API_BASE=http://localhost:8000
 ## Development
 
 Start the development server on http://localhost:3000:
-
+```bash
 # npm
 
 npm run dev
@@ -56,3 +56,4 @@ pnpm dev
 # yarn
 
 yarn dev
+```
