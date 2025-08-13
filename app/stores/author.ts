@@ -6,9 +6,11 @@ export const useAuthorStore = defineStore("author", {
     authors: [] as Author[],
     loading: false,
     error: null as string | null,
+    fetched: false,
   }),
   actions: {
     async fetchAuthors() {
+      if (this.fetched) return;
       this.loading = true;
       this.error = null;
 
@@ -30,6 +32,7 @@ export const useAuthorStore = defineStore("author", {
 
         const data = await res.json();
         this.authors = data.member;
+        this.fetched = true;
       } catch (e: unknown) {
         if (e instanceof Error) {
           this.error = e.message;

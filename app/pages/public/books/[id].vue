@@ -1,83 +1,69 @@
 <script setup lang="ts">
 import { useRoute } from "vue-router";
-import { ref, onMounted } from "vue";
-import type { Book } from "~/types/Book";
-import { useAuthStore } from "~/stores/auth";
+import { onMounted, watch } from "vue";
 
 const route = useRoute();
-const book = ref<Book | null>(null);
-const loading = ref(false);
-const error = ref<string | null>(null);
-
-const auth = useAuthStore();
-
-async function fetchBook(id: string) {
-  loading.value = true;
-  error.value = null;
-  try {
-    const res = await fetch(
-      `${useRuntimeConfig().public.apiBase}/api/books/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${auth.token}`,
-        },
-      }
-    );
-    if (!res.ok) {
-      throw new Error(`Failed to fetch book (status: ${res.status})`);
-    }
-    book.value = await res.json();
-  } catch (err) {
-    if (err instanceof Error) {
-      error.value = err.message;
-    } else {
-      error.value = "Erreur inconnue";
-    }
-  } finally {
-    loading.value = false;
-  }
-}
+const bookStore = useBookStore();
 
 onMounted(() => {
-  const id = route.params.id as string;
-  fetchBook(id);
+  const id = Number(route.params.id);
+  if (!isNaN(id)) {
+    bookStore.fetchBookById(id);
+  }
 });
+
+watch(
+  () => route.params.id,
+  (newId) => {
+    const id = Number(newId);
+    if (!isNaN(id)) {
+      bookStore.fetchBookById(id);
+    }
+  }
+);
 </script>
 
 <template>
   <section class="book-container">
-    <div v-if="loading" class="loader">
+    <div v-if="bookStore.loading" class="loader">
       <span class="spinner"></span> Loading the book...
     </div>
 
-    <div v-else-if="error" class="error-card">❌ {{ error }}</div>
+    <div v-else-if="bookStore.error" class="error-card">
+      ❌ {{ bookStore.error }}
+    </div>
 
-    <div v-else-if="book" class="book-card">
-      <h1 class="title">{{ book.title }}</h1>
+    <div v-else-if="bookStore.currentBook" class="book-card">
+      <h1 class="title">{{ bookStore.currentBook.title }}</h1>
 
       <p class="author">
         <strong>Author :</strong>
-        {{ book.author?.firstName }} {{ book.author?.lastName }}
+        {{ bookStore.currentBook.author?.firstName }}
+        {{ bookStore.currentBook.author?.lastName }}
       </p>
 
       <p class="description">
         <strong>Description :</strong>
-        <span>{{ book.description || "Aucune description" }}</span>
+        <span>{{
+          bookStore.currentBook.description || "Aucune description"
+        }}</span>
       </p>
 
       <p class="pub-date">
         <strong>Publication date :</strong>
         {{
-          book.publishedAt
-            ? new Date(book.publishedAt).toLocaleDateString()
+          bookStore.currentBook.publishedAt
+            ? new Date(bookStore.currentBook.publishedAt).toLocaleDateString()
             : "N/A"
         }}
       </p>
 
-      <div v-if="book.categories?.length" class="categories">
+      <div v-if="bookStore.currentBook.categories?.length" class="categories">
         <h2>Categories</h2>
         <ul>
-          <li v-for="cat in book.categories" :key="cat.id">{{ cat.name }}</li>
+          <li v-for="cat in bookStore.currentBook.categories" :key="cat.id">
+            {{ cat.name }}
+          </li>
         </ul>
       </div>
     </div>

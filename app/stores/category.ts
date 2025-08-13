@@ -6,9 +6,11 @@ export const useCategoryStore = defineStore("category", {
     categories: [] as Category[],
     loading: false,
     error: null as string | null,
+    fetched: false,
   }),
   actions: {
     async fetchCategories() {
+      if (this.fetched) return;
       this.loading = true;
       this.error = null;
 
@@ -30,6 +32,7 @@ export const useCategoryStore = defineStore("category", {
 
         const data = await res.json();
         this.categories = data.member;
+        this.fetched = true;
       } catch (e: unknown) {
         if (e instanceof Error) {
           this.error = e.message;
