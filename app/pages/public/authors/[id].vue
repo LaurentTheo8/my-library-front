@@ -1,73 +1,57 @@
 <script setup lang="ts">
 import { useRoute } from "vue-router";
-import { ref, onMounted } from "vue";
-import type { Author } from "~/types/Author";
-import { useAuthStore } from "~/stores/auth";
+import { onMounted, watch } from "vue";
 
 const route = useRoute();
-const author = ref<Author | null>(null);
-const loading = ref(false);
-const error = ref<string | null>(null);
-
-const auth = useAuthStore();
-
-async function fetchAuthor(id: string) {
-  loading.value = true;
-  error.value = null;
-  try {
-    const res = await fetch(
-      `${useRuntimeConfig().public.apiBase}/api/authors/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${auth.token}`,
-        },
-      }
-    );
-    if (!res.ok) {
-      throw new Error(`Failed to fetch author (status: ${res.status})`);
-    }
-    author.value = await res.json();
-  } catch (err) {
-    if (err instanceof Error) {
-      error.value = err.message;
-    } else {
-      error.value = "Erreur inconnue";
-    }
-  } finally {
-    loading.value = false;
-  }
-}
+const authorStore = useAuthorStore();
 
 onMounted(() => {
-  const id = route.params.id as string;
-  fetchAuthor(id);
+  const id = Number(route.params.id);
+  if (!isNaN(id)) {
+    authorStore.fetchAuthorById(id);
+  }
 });
+
+watch(
+  () => route.params.id,
+  (newId) => {
+    const id = Number(newId);
+    if (!isNaN(id)) {
+      authorStore.fetchAuthorById(id);
+    }
+  }
+);
 </script>
 
 <template>
   <section class="author-container">
-    <div v-if="loading" class="loader">
+    <div v-if="authorStore.loading" class="loader">
       <span class="spinner"></span> Loading the author...
     </div>
 
-    <div v-else-if="error" class="error-card">❌ {{ error }}</div>
+    <div v-else-if="authorStore.error" class="error-card">
+      ❌ {{ authorStore.error }}
+    </div>
 
-    <div v-else-if="author" class="author-card">
-      <h1 class="name">{{ author.firstName }} {{ author.lastName }}</h1>
+    <div v-else-if="authorStore.currentAuthor" class="author-card">
+      <h1 class="name">
+        {{ authorStore.currentAuthor.firstName }}
+        {{ authorStore.currentAuthor.lastName }}
+      </h1>
 
       <p class="birthdate">
         <strong>Birthdate :</strong>
         {{
-          author.birthDate
-            ? new Date(author.birthDate).toLocaleDateString()
+          authorStore.currentAuthor.birthDate
+            ? new Date(authorStore.currentAuthor.birthDate).toLocaleDateString()
             : "N/A"
         }}
       </p>
 
-      <div v-if="author.books?.length" class="books">
+      <div v-if="authorStore.currentAuthor.books?.length" class="books">
         <h2>Books</h2>
         <ul>
-          <li v-for="book in author.books" :key="book.id">
+          <li v-for="book in authorStore.currentAuthor.books" :key="book.id">
             <NuxtLink :to="`/public/books/${book.id}`">{{
               book.title
             }}</NuxtLink>
