@@ -48,7 +48,12 @@ const accessibleAdminLinks = computed(() => {
   );
 });
 
-const accessibleLinks = computed(() => publicLinks);
+const accessibleLinks = computed(() => {
+  if (!auth.isAuthenticated) {
+    return publicLinks.filter((link) => link.name === "Home");
+  }
+  return publicLinks;
+});
 </script>
 
 <template>

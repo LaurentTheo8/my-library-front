@@ -19,7 +19,7 @@ const authStore = useAuthStore();
         </p>
         <div class="mt-8">
           <NuxtLink
-            to="/admin/books"
+            to="/public/books"
             class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
           >
             Explore the Library
