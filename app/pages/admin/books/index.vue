@@ -23,7 +23,7 @@ async function handleDeleteBook(id: number) {
 }
 
 onMounted(() => {
-  bookStore.fetchBooks();
+  bookStore.fetchAllBooks();
 });
 </script>
 

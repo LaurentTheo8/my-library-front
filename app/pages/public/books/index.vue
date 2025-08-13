@@ -5,6 +5,11 @@ import BookCard from "~/components/card/Book.vue";
 
 const bookStore = useBookStore();
 
+function goToPage(page: number) {
+  if (page < 1 || page > (bookStore.lastPage || 1)) return;
+  bookStore.fetchBooks(page);
+}
+
 onMounted(() => {
   bookStore.fetchBooks();
 });
@@ -25,13 +30,36 @@ onMounted(() => {
     </div>
 
     <!-- No books -->
-    <div v-else-if="bookStore.books.length === 0" class="empty">
+    <div v-else-if="(bookStore.books?.length ?? 0) === 0" class="empty">
       No books found.
     </div>
 
     <!-- Books list -->
     <div v-else class="books-grid">
       <BookCard v-for="book in bookStore.books" :key="book.id" :book="book" />
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex items-center gap-3 mt-6 justify-center">
+      <button
+        :disabled="bookStore.currentPage === 1"
+        @click="goToPage(bookStore.currentPage - 1)"
+        class="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+      >
+        ⬅ Prev
+      </button>
+
+      <span class="text-gray-700 font-medium">
+        Page {{ bookStore.currentPage }} / {{ bookStore.lastPage }}
+      </span>
+
+      <button
+        :disabled="bookStore.currentPage === bookStore.lastPage"
+        @click="goToPage(bookStore.currentPage + 1)"
+        class="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+      >
+        Next ➡
+      </button>
     </div>
   </section>
 </template>

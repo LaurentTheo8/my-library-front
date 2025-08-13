@@ -22,10 +22,60 @@ export const useBookStore = defineStore("book", {
     loading: false,
     error: null as string | null,
     fetched: false,
+
+    // Pagination
+    totalItems: 0,
+    currentPage: 1,
+    lastPage: 1,
   }),
   actions: {
-    async fetchBooks() {
-      if (this.fetched) return;
+    async fetchBooks(page = 1) {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("No auth token found");
+
+        const base = useRuntimeConfig().public.apiBase;
+        const res = await fetch(`${base}/api/books?page=${page}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch books");
+
+        const data = await res.json();
+
+        // Ici on prend direct "member"
+        this.books = Array.isArray(data.member) ? data.member : [];
+
+        // Pagination
+        this.totalItems =
+          typeof data.totalItems === "number" ? data.totalItems : 0;
+
+        const view = data.view;
+        let last = 1;
+        if (view?.last) {
+          const lastParam = new URL(view.last, base).searchParams.get("page");
+          last = lastParam ? Number(lastParam) || 1 : 1;
+        } else if (this.totalItems && this.books.length) {
+          last = Math.ceil(this.totalItems / this.books.length);
+        }
+
+        this.currentPage = page;
+        this.lastPage = last;
+      } catch (e) {
+        this.error = e instanceof Error ? e.message : "Unknown error";
+        this.books = [];
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async fetchAllBooks() {
       this.loading = true;
       this.error = null;
 
@@ -34,7 +84,7 @@ export const useBookStore = defineStore("book", {
         if (!token) throw new Error("No auth token found");
 
         const res = await fetch(
-          `${useRuntimeConfig().public.apiBase}/api/books`,
+          `${useRuntimeConfig().public.apiBase}/api/books/all`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -43,17 +93,14 @@ export const useBookStore = defineStore("book", {
           }
         );
 
-        if (!res.ok) throw new Error("Failed to fetch books");
+        if (!res.ok) throw new Error("Failed to fetch all books");
 
         const data = await res.json();
         this.books = data.member;
-        this.fetched = true;
-      } catch (e: unknown) {
-        if (e instanceof Error) {
-          this.error = e.message;
-        } else {
-          this.error = "Unknown error";
-        }
+        this.currentPage = 1;
+        this.lastPage = 1;
+      } catch (e) {
+        this.error = e instanceof Error ? e.message : "Unknown error";
       } finally {
         this.loading = false;
       }
