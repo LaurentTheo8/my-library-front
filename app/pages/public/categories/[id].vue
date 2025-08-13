@@ -1,71 +1,59 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { useAuthStore } from "~/stores/auth";
-import type { Category } from "~/types/Category";
+import { onMounted, watch } from "vue";
 
 const route = useRoute();
-const category = ref<Category | null>(null);
-const loading = ref(false);
-const error = ref<string | null>(null);
-const auth = useAuthStore();
-
-async function fetchCategory(id: string) {
-  loading.value = true;
-  error.value = null;
-
-  try {
-    const res = await fetch(
-      `${useRuntimeConfig().public.apiBase}/api/categories/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${auth.token}`,
-        },
-      }
-    );
-
-    if (!res.ok) {
-      throw new Error(`Failed to fetch category (status: ${res.status})`);
-    }
-
-    category.value = await res.json();
-  } catch (err) {
-    if (err instanceof Error) {
-      error.value = err.message;
-    } else {
-      error.value = "Unknown error";
-    }
-  } finally {
-    loading.value = false;
-  }
-}
+const categoryStore = useCategoryStore();
 
 onMounted(() => {
-  const id = route.params.id as string;
-  fetchCategory(id);
+  const id = Number(route.params.id);
+  if (!isNaN(id)) {
+    categoryStore.fetchCategoryById(id);
+  }
 });
+
+watch(
+  () => route.params.id,
+  (newId) => {
+    const id = Number(newId);
+    if (!isNaN(id)) {
+      categoryStore.fetchCategoryById(id);
+    }
+  }
+);
 </script>
 
 <template>
   <section class="category-details-container">
-    <div v-if="loading" class="loader">
+    <div v-if="categoryStore.loading" class="loader">
       <span class="spinner"></span> Loading category...
     </div>
 
-    <div v-else-if="error" class="error-card">❌ {{ error }}</div>
+    <div v-else-if="categoryStore.error" class="error-card">
+      ❌ {{ categoryStore.error }}
+    </div>
 
-    <div v-else-if="category" class="category-card">
-      <h1 class="title">{{ category.name }}</h1>
+    <div v-else-if="categoryStore.currentCategory" class="category-card">
+      <h1 class="title">{{ categoryStore.currentCategory.name }}</h1>
 
       <p class="description">
         <strong>Description :</strong>
-        <span>{{ category.description || "No description available." }}</span>
+        <span>{{
+          categoryStore.currentCategory.description ||
+          "No description available."
+        }}</span>
       </p>
 
-      <div v-if="category.books?.length" class="books-list">
+      <div
+        v-if="categoryStore.currentCategory.books?.length"
+        class="books-list"
+      >
         <h2>Books in this category</h2>
         <ul>
-          <li v-for="book in category.books" :key="book.id">
+          <li
+            v-for="book in categoryStore.currentCategory.books"
+            :key="book.id"
+          >
             <NuxtLink :to="`/public/books/${book.id}`">{{
               book.title
             }}</NuxtLink>
